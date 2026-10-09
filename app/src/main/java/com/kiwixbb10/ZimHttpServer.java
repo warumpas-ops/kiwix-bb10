@@ -42,7 +42,7 @@ public class ZimHttpServer extends NanoHTTPD {
     }
 
     public ZimHttpServer(ZimReader reader) throws IOException {
-        super("127.0.0.1", PORT);
+        super(null, PORT); // Bind to all interfaces (0.0.0.0) for local Wi-Fi sharing
         mReader = reader;
     }
 
@@ -187,7 +187,7 @@ public class ZimHttpServer extends NanoHTTPD {
         // Inject base tag into HTML so relative URLs work
         if (mimeType.startsWith("text/html")) {
             String html = new String(data, "UTF-8");
-            String baseHref = BASE_URL + "/" + entry.namespace + "/";
+            String baseHref = "/" + entry.namespace + "/";
             // Inject <base href="..."> after <head>
             String baseTag = "<base href=\"" + baseHref + "\">";
             int headIdx = html.indexOf("<head>");

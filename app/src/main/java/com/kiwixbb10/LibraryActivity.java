@@ -2,6 +2,7 @@ package com.kiwixbb10;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,6 +41,7 @@ public class LibraryActivity extends Activity {
         mListView  = (ListView)  findViewById(R.id.list_zim_files);
         mTextEmpty = (TextView)  findViewById(R.id.text_empty);
         mBtnRefresh= (Button)    findViewById(R.id.btn_refresh);
+        Button btnGetBooks = (Button) findViewById(R.id.btn_get_books);
 
         mAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, mDisplayNames) {
@@ -48,12 +50,12 @@ public class LibraryActivity extends Activity {
                 View v = super.getView(position, convertView, parent);
                 ((TextView) v.findViewById(android.R.id.text1))
                         .setTextColor(0xFFEEEEEE);
-                v.setBackgroundColor(position % 2 == 0 ? 0xFF1a1a2e : 0xFF16213e);
+                v.setBackgroundColor(position % 2 == 0 ? 0xFF181818 : 0xFF222222);
                 return v;
             }
         };
         mListView.setAdapter(mAdapter);
-        mListView.setBackgroundColor(0xFF1a1a2e);
+        mListView.setBackgroundColor(0xFF121212);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -69,7 +71,50 @@ public class LibraryActivity extends Activity {
             }
         });
 
+        if (btnGetBooks != null) {
+            btnGetBooks.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showCatalogDialog();
+                }
+            });
+        }
+
         scanForZimFiles();
+    }
+
+    private void showCatalogDialog() {
+        final String[] items = {
+            "Open Kiwix Library (library.kiwix.org)",
+            "English Wikipedia (Mini / Top Articles)",
+            "German Wikipedia (Mini / Top Articles)",
+            "French Wikipedia (Mini / Top Articles)",
+            "Wiktionary (English Dictionary)",
+            "WikiMed (Medical Encyclopedia)",
+            "Project Gutenberg (Classic Books)"
+        };
+        final String[] urls = {
+            "https://library.kiwix.org",
+            "https://download.kiwix.org/zim/wikipedia/",
+            "https://download.kiwix.org/zim/wikipedia/",
+            "https://download.kiwix.org/zim/wikipedia/",
+            "https://download.kiwix.org/zim/wiktionary/",
+            "https://download.kiwix.org/zim/wikimed/",
+            "https://download.kiwix.org/zim/gutenberg/"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Get Offline Content");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(android.net.Uri.parse(urls[which]));
+                startActivity(i);
+            }
+        });
+        builder.setNegativeButton("Close", null);
+        builder.show();
     }
 
     private void scanForZimFiles() {

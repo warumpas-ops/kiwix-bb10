@@ -31,15 +31,27 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btn_refresh"
+            android:id="@+id/btn_get_books"
             android:layout_width="wrap_content"
             android:layout_height="34dp"
-            android:text="Scan Storage"
+            android:text="Catalog"
             android:textSize="12sp"
             android:textColor="#ffffff"
             android:background="#003566"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp" />
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginRight="6dp" />
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="Scan"
+            android:textSize="12sp"
+            android:textColor="#ffffff"
+            android:background="#003566"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
     </LinearLayout>
 
     <!-- ZIM file list -->

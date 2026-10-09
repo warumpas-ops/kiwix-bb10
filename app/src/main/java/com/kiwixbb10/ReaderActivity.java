@@ -49,6 +49,7 @@ public class ReaderActivity extends Activity {
     private Button      mBtnZoom;
     private Button      mBtnBookmark;
     private Button      mBtnBookmarksList;
+    private Button      mBtnShare;
     private ProgressBar mProgress;
 
     private ZimReader     mReader;
@@ -76,6 +77,7 @@ public class ReaderActivity extends Activity {
         mBtnZoom          = (Button)      findViewById(R.id.btn_zoom);
         mBtnBookmark      = (Button)      findViewById(R.id.btn_bookmark);
         mBtnBookmarksList = (Button)      findViewById(R.id.btn_bookmarks_list);
+        mBtnShare         = (Button)      findViewById(R.id.btn_share);
         mProgress         = (ProgressBar) findViewById(R.id.progress);
 
         mZimPath = getIntent().getStringExtra("zim_path");
@@ -203,6 +205,13 @@ public class ReaderActivity extends Activity {
             }
         });
 
+        mBtnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showWifiSharingDialog();
+            }
+        });
+
         mEditSearch.setOnEditorActionListener(new android.widget.TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(android.widget.TextView v, int actionId, KeyEvent event) {
@@ -215,6 +224,34 @@ public class ReaderActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    private String getLocalIpAddress() {
+        try {
+            for (java.util.Enumeration<java.net.NetworkInterface> en = java.net.NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                java.net.NetworkInterface intf = en.nextElement();
+                for (java.util.Enumeration<java.net.InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    java.net.InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof java.net.Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return "127.0.0.1";
+    }
+
+    private void showWifiSharingDialog() {
+        String ip = getLocalIpAddress();
+        String shareUrl = "http://" + ip + ":" + ZimHttpServer.PORT + "/";
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Wi-Fi Hotspot Sharing");
+        builder.setMessage("Your BlackBerry is hosting this Wikipedia offline!\n\n" +
+                "Any device connected to your Wi-Fi or Mobile Hotspot can read it at:\n\n" +
+                shareUrl + "\n\n" +
+                "Just open that address in Chrome, Safari, or Firefox on your computer or phone.");
+        builder.setPositiveButton("OK", null);
+        builder.show();
     }
 
     private void toggleNightMode() {
@@ -401,6 +438,9 @@ public class ReaderActivity extends Activity {
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_L) {
             showBookmarksDialog();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_W) {
+            showWifiSharingDialog();
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_PLUS || keyCode == KeyEvent.KEYCODE_EQUALS) {
             cycleZoom();
