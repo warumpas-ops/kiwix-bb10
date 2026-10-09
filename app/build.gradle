@@ -36,4 +36,6 @@ dependencies {
     implementation 'org.apache.commons:commons-compress:1.21'
     // XZ/LZMA tuples for commons-compress (pure Java)
     implementation 'org.tukaani:xz:1.9'
+    // Zstandard JNI for Android
+    implementation 'com.github.luben:zstd-jni:1.5.5-11@aar'
 }

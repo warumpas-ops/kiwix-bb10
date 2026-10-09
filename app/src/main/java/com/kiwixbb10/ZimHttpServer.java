@@ -72,19 +72,21 @@ public class ZimHttpServer extends NanoHTTPD {
             return handleMainPage();
         }
 
-        // Article/asset request: /NAMESPACE/url
-        if (uri.length() > 2 && uri.charAt(0) == '/') {
-            char ns = uri.charAt(1);
-            if (uri.charAt(2) == '/') {
-                String url = uri.substring(3);
-                // Decode %xx encoding
-                url = decodeUrl(url);
-                return handleArticle(ns, url);
+        // Clean and decode URI
+        String cleanUri = decodeUrl(uri.startsWith("/") ? uri.substring(1) : uri);
+
+        // Check if explicit namespace: /X/...
+        if (cleanUri.length() >= 2 && cleanUri.charAt(1) == '/') {
+            char ns = cleanUri.charAt(0);
+            String subUrl = cleanUri.substring(2);
+            Response resp = handleArticle(ns, subUrl);
+            if (resp.getStatus() == Response.Status.OK) {
+                return resp;
             }
         }
 
-        return newFixedLengthResponse(Response.Status.NOT_FOUND,
-                "text/plain", "Not found: " + uri);
+        // Direct article lookup across all namespaces (C for v6, A/- /I for v5)
+        return handleFlexibleArticle(cleanUri);
     }
 
     private Response handleMainPage() {
@@ -110,20 +112,29 @@ public class ZimHttpServer extends NanoHTTPD {
         try {
             ZimReader.DirectoryEntry entry = mReader.findByUrl(namespace, url);
             if (entry == null) {
-                // Try common fallback namespaces
-                if (namespace == 'A') {
-                    entry = mReader.findByUrl('-', url);
-                } else if (namespace == '-') {
-                    entry = mReader.findByUrl('I', url);
-                }
-            }
-            if (entry == null) {
                 return newFixedLengthResponse(Response.Status.NOT_FOUND,
-                        "text/plain", "Article not found: " + namespace + "/" + url);
+                        "text/plain", "Not found: " + namespace + "/" + url);
             }
             return serveEntry(entry);
         } catch (Exception e) {
             Log.e(TAG, "Article error: " + url, e);
+            return errorPage("Error loading: " + url + "<br>" + e.getMessage());
+        }
+    }
+
+    private Response handleFlexibleArticle(String url) {
+        if (mReader == null) {
+            return errorPage("No ZIM file loaded");
+        }
+        try {
+            ZimReader.DirectoryEntry entry = mReader.findArticle(url);
+            if (entry == null) {
+                return newFixedLengthResponse(Response.Status.NOT_FOUND,
+                        "text/plain", "Article not found: " + url);
+            }
+            return serveEntry(entry);
+        } catch (Exception e) {
+            Log.e(TAG, "Flexible article error: " + url, e);
             return errorPage("Error loading: " + url + "<br>" + e.getMessage());
         }
     }

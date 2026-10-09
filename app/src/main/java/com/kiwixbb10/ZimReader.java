@@ -252,21 +252,29 @@ public class ZimReader {
         return result;
     }
 
-    /** Search articles by URL prefix using binary search on the URL pointer list. */
+    /** Search articles by URL or title. */
     public List<DirectoryEntry> searchByTitle(String query, int maxResults) throws IOException {
         List<DirectoryEntry> results = new ArrayList<DirectoryEntry>();
         String lowerQuery = query.toLowerCase();
 
-        // Linear scan through title-sorted list for matches (simple but works)
+        boolean hasTitleTable = (titlePtrPos != 0xFFFFFFFFFFFFFFFFL && titlePtrPos > 0);
         long count = Math.min(articleCount, 50000L);
+
         for (long i = 0; i < count && results.size() < maxResults; i++) {
-            long urlIdx = getTitlePtrAt(i);
-            if (urlIdx >= articleCount) continue;
-            long offset = getUrlPtrAt(urlIdx);
+            long offset;
+            if (hasTitleTable) {
+                long urlIdx = getTitlePtrAt(i);
+                if (urlIdx >= articleCount) continue;
+                offset = getUrlPtrAt(urlIdx);
+            } else {
+                offset = getUrlPtrAt(i);
+            }
             try {
                 DirectoryEntry e = readDirectoryEntry(offset);
-                if (e.namespace == 'A' && !e.isRedirect()) {
-                    if (e.title.toLowerCase().contains(lowerQuery)) {
+                // In ZIM v6 content is 'C', in ZIM v5 content is 'A'
+                if ((e.namespace == 'C' || e.namespace == 'A') && !e.isRedirect()) {
+                    String matchTarget = e.title.isEmpty() ? e.url : e.title;
+                    if (matchTarget.toLowerCase().contains(lowerQuery)) {
                         results.add(e);
                     }
                 }
@@ -283,7 +291,7 @@ public class ZimReader {
         return resolveRedirect(e);
     }
 
-    /** Find an article by namespace + URL using binary search. */
+    /** Find an entry by namespace + URL using binary search. */
     public DirectoryEntry findByUrl(char namespace, String url) throws IOException {
         String target = namespace + "/" + url;
         long lo = 0, hi = articleCount - 1;
@@ -297,6 +305,26 @@ public class ZimReader {
             if (cmp < 0) lo = mid + 1;
             else hi = mid - 1;
         }
+        return null;
+    }
+
+    /** Flexible lookup trying common namespaces (C for v6, A/- /I for v5). */
+    public DirectoryEntry findArticle(String url) throws IOException {
+        // Try Content namespace (ZIM v6)
+        DirectoryEntry e = findByUrl('C', url);
+        if (e != null) return e;
+
+        // Try Article namespace (ZIM v5)
+        e = findByUrl('A', url);
+        if (e != null) return e;
+
+        // Try Assets / Media namespaces
+        e = findByUrl('-', url);
+        if (e != null) return e;
+
+        e = findByUrl('I', url);
+        if (e != null) return e;
+
         return null;
     }
 
