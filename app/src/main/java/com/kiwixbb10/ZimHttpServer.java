@@ -67,6 +67,11 @@ public class ZimHttpServer extends NanoHTTPD {
             return handleSearch(q.trim());
         }
 
+        // Random article endpoint
+        if (uri.equals("/random")) {
+            return handleRandomArticle();
+        }
+
         // Root → main page
         if (uri.equals("/") || uri.isEmpty()) {
             return handleMainPage();
@@ -87,6 +92,25 @@ public class ZimHttpServer extends NanoHTTPD {
 
         // Direct article lookup across all namespaces (C for v6, A/- /I for v5)
         return handleFlexibleArticle(cleanUri);
+    }
+
+    private Response handleRandomArticle() {
+        if (mReader == null) {
+            return errorPage("No ZIM file loaded");
+        }
+        try {
+            ZimReader.DirectoryEntry rand = mReader.getRandomArticle();
+            if (rand != null) {
+                String target = BASE_URL + "/" + rand.namespace + "/" + rand.url;
+                Response redirect = newFixedLengthResponse(Response.Status.REDIRECT, "text/plain", "");
+                redirect.addHeader("Location", target);
+                return redirect;
+            }
+            return handleMainPage();
+        } catch (Exception e) {
+            Log.e(TAG, "Random article error", e);
+            return errorPage("Error loading random article: " + e.getMessage());
+        }
     }
 
     private Response handleMainPage() {

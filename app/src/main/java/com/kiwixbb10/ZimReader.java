@@ -328,6 +328,27 @@ public class ZimReader {
         return null;
     }
 
+    /** Select a random article from the archive. */
+    public DirectoryEntry getRandomArticle() throws IOException {
+        if (articleCount == 0) return null;
+        java.util.Random rnd = new java.util.Random();
+        for (int tries = 0; tries < 30; tries++) {
+            long idx = (long) (rnd.nextDouble() * articleCount);
+            long offset = getUrlPtrAt(idx);
+            DirectoryEntry e = readDirectoryEntry(offset);
+            if ((e.namespace == 'C' || e.namespace == 'A') && !e.isRedirect()) {
+                String u = e.url.toLowerCase();
+                if (u.endsWith(".png") || u.endsWith(".jpg") || u.endsWith(".svg") ||
+                    u.endsWith(".css") || u.endsWith(".js")  || u.endsWith(".ico") ||
+                    u.startsWith("_mw_") || u.startsWith("-/")) {
+                    continue;
+                }
+                return resolveRedirect(e);
+            }
+        }
+        return getMainPage();
+    }
+
     public void close() {
         try { mFile.close(); } catch (Exception ignored) {}
     }
