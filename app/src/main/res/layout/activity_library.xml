@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e">
+
+    <!-- Header -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#16213e"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Kiwix BB10"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Scan"
+            android:textSize="12sp"
+            android:textColor="#ffffff"
+            android:background="#0f3460"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp" />
+    </LinearLayout>
+
+    <!-- ZIM file list -->
+    <ListView
+        android:id="@+id/list_zim_files"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="#2a2a4a"
+        android:dividerHeight="1dp" />
+
+    <!-- Empty state -->
+    <TextView
+        android:id="@+id/text_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/no_zim_files"
+        android:textColor="#888888"
+        android:textSize="14sp"
+        android:padding="32dp"
+        android:visibility="gone" />
+
+</LinearLayout>

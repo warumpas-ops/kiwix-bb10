@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#16213e"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
+
+        <Button
+            android:id="@+id/btn_back_library"
+            android:layout_width="40dp"
+            android:layout_height="32dp"
+            android:text="&#8592;"
+            android:textSize="16sp"
+            android:textColor="#ffffff"
+            android:background="#0f3460"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp" />
+
+        <EditText
+            android:id="@+id/edit_search"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:hint="@string/search_hint"
+            android:textSize="13sp"
+            android:textColor="#ffffff"
+            android:textColorHint="#888888"
+            android:background="#0f3460"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:singleLine="true" />
+
+        <Button
+            android:id="@+id/btn_home"
+            android:layout_width="40dp"
+            android:layout_height="32dp"
+            android:text="&#8962;"
+            android:textSize="16sp"
+            android:textColor="#ffffff"
+            android:background="#0f3460"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp" />
+    </LinearLayout>
+
+    <!-- Progress bar -->
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:max="100"
+        android:visibility="gone" />
+
+    <!-- WebView -->
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.kiwixbb10'
+    compileSdkVersion 35
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'com.kiwixbb10'
+        minSdkVersion 18
+        targetSdkVersion 22
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release { minifyEnabled false }
+        debug   { debuggable true }
+    }
+
+    lint {
+        abortOnError false
+        disable 'NewApi'
+    }
+}
+
+dependencies {
+    // NanoHTTPD — tiny pure-Java HTTP server, API 18 compatible
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    // Apache Commons Compress — pure Java LZMA + zip + zstd support, API 18 compatible
+    implementation 'org.apache.commons:commons-compress:1.21'
+    // XZ/LZMA tuples for commons-compress (pure Java)
+    implementation 'org.tukaani:xz:1.9'
+}
